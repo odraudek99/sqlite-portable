@@ -3,6 +3,7 @@ package mx.com.odraudek99.simple;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -14,6 +15,9 @@ import mx.com.odraudek99.simple.neg.ServiceException;
 
 public class MainCorreccion {
 
+
+	final static Logger logger = Logger.getLogger(MainCorreccion.class);
+	
 	public static void main(String[] args) {
 
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:/spring.xml");
@@ -39,12 +43,11 @@ public class MainCorreccion {
 		try {
 			negocioImpl.iniciaPrueba(lista);
 		} catch (ServiceException e) {
-			System.out.println("ServiceException: Debe hacer rollback");
-			e.printStackTrace();
+			logger.error("ServiceException: Debe hacer rollback", e);
 		 } catch (DataAccessException ex) {
-			 System.out.println("DataAccessException:  Debe hacer rollback"); 
+			 logger.error("DataAccessException:  Debe hacer rollback", ex); 
 		 } catch (Exception ex) {
-			 System.out.println("Exception:  Debe hacer rollback");
+			 logger.error("Exception:  Debe hacer rollback", ex);
 		 }
 
 		negocioImpl.selectAll();
