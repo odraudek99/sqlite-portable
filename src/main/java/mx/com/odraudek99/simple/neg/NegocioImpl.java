@@ -27,16 +27,19 @@ public class NegocioImpl {
 	
 
 	
+	
 	@Transactional(rollbackFor = ServiceException.class, propagation = Propagation.REQUIRES_NEW)
 	public void iniciaPrueba(List<TPadre> idPadres) throws DataAccessException, ServiceException {
 		logger.info("idTrans: "+TransactionAspectSupport.currentTransactionStatus().hashCode());
+		logger.info("Thread.currentThread().getId(): "+Thread.currentThread().getId());
 		
 		 afectarC(idPadres);
 	}
 	
 	@Transactional(rollbackFor = ServiceException.class, propagation = Propagation.REQUIRED)
     public void afectarC(List<TPadre> idPadres) throws ServiceException {
-		
+		logger.info("idTrans: "+TransactionAspectSupport.currentTransactionStatus().hashCode());
+		logger.info("Thread.currentThread().getId(): "+Thread.currentThread().getId());
 		for (TPadre tPadre : idPadres) {
 			validarVigilables(tPadre);
 		}
@@ -46,7 +49,8 @@ public class NegocioImpl {
 	
 	@Transactional(rollbackFor = ServiceException.class, propagation = Propagation.REQUIRED)
 	public void validarVigilables(TPadre tPadre) throws ServiceException  {
-		
+		logger.info("idTrans: "+TransactionAspectSupport.currentTransactionStatus().hashCode());
+		logger.info("Thread.currentThread().getId(): "+Thread.currentThread().getId());
 		if (daoImpl.updateHijas(tPadre) == null) {
 			logger.info("Lanzar excepcion");
 			throw new ServiceException();
@@ -55,16 +59,25 @@ public class NegocioImpl {
 		
 	}
 
-	public void selectAll() {
+	public List<TPadre> selectAll() {
 		List<TPadre> lista = daoImpl.selectPadreAll();
+		logger.info("Thread.currentThread().getId(): "+Thread.currentThread().getId());
 		for (TPadre padre : lista) {
 			logger.info(padre.toString());
 			List<THija> hijas= daoImpl.selectHijaAll(padre.getIdTPadre());
 			for (THija hija: hijas) {
 				logger.info(hija.toString());	
 			}
-		}
-		
+		}	
+		return lista;
+	}
+	
+	
+	@Transactional(rollbackFor = ServiceException.class)
+	public void actualizaPadre(Integer id, String nombre){
+		logger.info("idTrans.Hilo: "+TransactionAspectSupport.currentTransactionStatus().hashCode());
+		logger.info("Thread.currentThread().getId().Hilo: "+Thread.currentThread().getId());
+		daoImpl.actualizaPadre(id, nombre+":"+TransactionAspectSupport.currentTransactionStatus().hashCode()+":"+Thread.currentThread().getId());
 	}
 
 	

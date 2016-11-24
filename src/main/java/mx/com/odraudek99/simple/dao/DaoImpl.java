@@ -64,5 +64,10 @@ public class DaoImpl {
 	public List<TPadre> selectPadreAll() {
 		return jdbcTemplate.query("select * from T_PADRE ", new BeanPropertyRowMapper<TPadre>(TPadre.class));
 	}
+
+	public void actualizaPadre(Integer id, String nombre) {
+		jdbcTemplate.update("UPDATE T_PADRE SET DESCRIPCION = ? WHERE ID_T_PADRE = ? ", new Object[]{nombre, id});
+		
+	}
 	
 }
