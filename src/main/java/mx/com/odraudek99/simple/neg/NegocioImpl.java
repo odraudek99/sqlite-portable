@@ -2,6 +2,8 @@ package mx.com.odraudek99.simple.neg;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +73,21 @@ public class NegocioImpl {
 		}	
 		return lista;
 	}
-	
+
+	static int truena = 1;
 	
 	@Transactional(rollbackFor = ServiceException.class)
-	public void actualizaPadre(Integer id, String nombre){
-		logger.info("idTrans.Hilo: "+TransactionAspectSupport.currentTransactionStatus().hashCode());
-		logger.info("Thread.currentThread().getId().Hilo: "+Thread.currentThread().getId());
+	public void actualizaPadre(Integer id, String nombre) throws ServiceException{
+		logger.info("idTrans.Hilo: "+nombre+","+TransactionAspectSupport.currentTransactionStatus().hashCode());
+		logger.info("Thread.currentThread().getId().Hilo: "+nombre+","+Thread.currentThread().getId());
 		daoImpl.actualizaPadre(id, nombre+":"+TransactionAspectSupport.currentTransactionStatus().hashCode()+":"+Thread.currentThread().getId());
+//		daoImpl.actualizaPadre(id, nombre+":"+":"+Thread.currentThread().getId());
+		
+		truena++;
+		if (truena%2==0) {
+			throw new ServiceException("Forzando excepcion");
+		}
+		
 	}
 
 	

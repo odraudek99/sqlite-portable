@@ -2,8 +2,6 @@ package mx.com.odraudek99.simple;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -12,7 +10,7 @@ import org.springframework.dao.DataAccessException;
 
 import mx.com.odraudek99.simple.dto.THija;
 import mx.com.odraudek99.simple.dto.TPadre;
-import mx.com.odraudek99.simple.neg.HiloTransaccional;
+import mx.com.odraudek99.simple.neg.Negocio2Impl;
 import mx.com.odraudek99.simple.neg.NegocioImpl;
 import mx.com.odraudek99.simple.neg.ServiceException;
 
@@ -26,6 +24,8 @@ public class MainCorreccion {
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:/spring.xml");
 
 		NegocioImpl negocioImpl = (NegocioImpl) context.getBean(NegocioImpl.class);
+		
+		Negocio2Impl negocio2Impl = (Negocio2Impl) context.getBean(Negocio2Impl.class);
 		
 		logger.info("Thread.currentThread(): "+Thread.currentThread().getId());
 		TPadre p1 = new TPadre(1);
@@ -54,19 +54,25 @@ public class MainCorreccion {
 			 logger.error("Exception:  Debe hacer rollback", ex);
 		 }
 
-		List<TPadre> listaP = negocioImpl.selectAll();
-		
-		//Use the executor created by the newCachedThreadPool() method 
-        //only when you have a reasonable number of threads 
-        //or when they have a short duration.
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
-        for (TPadre p : listaP) 
-        {
-        	HiloTransaccional task = new HiloTransaccional(p.getIdTPadre(),p.getDescripcion(), negocioImpl);
-            logger.info("A new task has been added : " + task.getNombreHilo());
-            executor.execute(task);
-        }
-        executor.shutdown();
+		try {
+			negocio2Impl.pruebaTransaccionHilos();
+		} catch (ServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		List<TPadre> listaP = negocioImpl.selectAll();
+//		
+//		//Use the executor created by the newCachedThreadPool() method 
+//        //only when you have a reasonable number of threads 
+//        //or when they have a short duration.
+//        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
+//        for (TPadre p : listaP) 
+//        {
+//        	HiloTransaccional task = new HiloTransaccional(p.getIdTPadre(),p.getDescripcion(), negocioImpl);
+//            logger.info("A new task has been added : " + task.getNombreHilo());
+//            executor.execute(task);
+//        }
+//        executor.shutdown();
 		
 	}
 

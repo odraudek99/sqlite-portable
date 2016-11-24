@@ -1,8 +1,9 @@
 package mx.com.odraudek99.simple.neg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 
 public class HiloTransaccional implements Runnable {
@@ -15,6 +16,7 @@ public class HiloTransaccional implements Runnable {
 	private String nombreHilo;
 	private Integer id;
 	
+	public static List<String> errores = new ArrayList<String>();
 	
 	public HiloTransaccional(Integer id, String nombreHilo, NegocioImpl negocioImpl) {
 		this.nombreHilo = nombreHilo;
@@ -24,7 +26,12 @@ public class HiloTransaccional implements Runnable {
 
 	public void run() {
 		logger.info("Inicia hilo: "+this.id+", "+this.nombreHilo);
-		negocioImpl.actualizaPadre(id, "Hilo: "+nombreHilo);
+		try {
+			negocioImpl.actualizaPadre(id, "H_"+nombreHilo);
+		} catch (ServiceException e) {
+			logger.error("Error :::: "+e.getMensaje());
+			errores.add("Error: "+nombreHilo);
+		}
 		logger.info("Termina hilo: "+nombreHilo);
 	}
 
